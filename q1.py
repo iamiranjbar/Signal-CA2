@@ -23,7 +23,7 @@ X = fft.fft(x, n=NFFT)
 X_abs = 2* np.absolute(X) / L
 half = int(NFFT/2)
 freq = fft.fftfreq(NFFT, d=1/fs)
-b, a = butter_bandstop_filter(1550, 1750, fs)
+b, a = butter_bandstop_filter(1550, 1650, fs)
 w, h = signal.freqz(b, a)
 y = signal.lfilter(b, a, x)
 

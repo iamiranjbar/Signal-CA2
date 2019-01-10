@@ -14,7 +14,6 @@ def p1():
 	d = [[] for x in range(0,10)]
 	for x in range(0,10):
 		d[x] = np.sin(c[x][0]*n) + np.sin(c[x][1]*n)
-	#print(d)
 	for x in range(0,10):
 		wavfile.write('q2p1' + str(x) + '.wav', 8192 , d[x])
 
@@ -26,8 +25,6 @@ def p2():
 		d[x] = np.sin(c[x][0]*n) + np.sin(c[x][1]*n)
 	for x in range(0,10):
 		L = len(d[x])
-		#print('L =', L, sep=' ')
-		#* nextpow2(L)
 		X = fft.fft(d[x], n=2048)
 		X_abs = 2* np.absolute(X) / L
 		half = int(2048/2)
@@ -42,22 +39,18 @@ def p2():
 
 def p3():
 	n = np.array([n for n in range(0, 1000)])
-	z = [0 for n in range(0, 100)]
-	print(z)
+	space = np.zeros(100)
 	c = [[0.7217, 1.0247], [0.5346, 0.9273], [0.5346, 1.0247], [0.5346, 1.1328], [0.5906, 0.9273], [0.5906, 1.0247], [0.5906, 1.1328], [0.6535, 0.9273], [0.6535, 1.0247], [0.6535, 1.1328]]
 	d = [[] for x in range(0,10)]
 	for x in range(0,10):
 		d[x] = np.sin(c[x][0]*n) + np.sin(c[x][1]*n)
-	pat = ['0','z','1','z','9','z','5','z','4','z','2','z','7','z']
+	pattern = [0,-1,1,-1,9,-1,5,-1,4,-1,0,-1,2,-1]
 	phone = []
-	for x in pat:
-		if x == 'z':
-			for n in range(0, 100):
-				phone += [0]
+	for x in pattern:
+		if x == -1:
+			phone.extend(space)
 		else:
-			for n in range(0, 1000):
-				phone += [d[ord(x) - ord('0')][n]]
-	#phone = d[0] + z + d[1] + z + d[9] + z + d[5] + z + d[4] + z + d[2] + z + d[7] + z
+			phone.extend(d[x])
 	wavfile.write('sid.wav', 8192 , np.array(phone))
 
 def p4():
