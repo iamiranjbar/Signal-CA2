@@ -8,16 +8,16 @@ from scipy import signal
 
 csv.field_size_limit(sys.maxsize)
 
-def p1():
+def part1():
 	n = np.array([n for n in range(0, 1000)])
 	c = [[0.7217, 1.0247], [0.5346, 0.9273], [0.5346, 1.0247], [0.5346, 1.1328], [0.5906, 0.9273], [0.5906, 1.0247], [0.5906, 1.1328], [0.6535, 0.9273], [0.6535, 1.0247], [0.6535, 1.1328]]
 	d = [[] for x in range(0,10)]
 	for x in range(0,10):
 		d[x] = np.sin(c[x][0]*n) + np.sin(c[x][1]*n)
 	for x in range(0,10):
-		wavfile.write('q2p1' + str(x) + '.wav', 8192 , d[x])
+		wavfile.write('q2_part1_' + str(x) + '.wav', 8192 , d[x])
 
-def p2():
+def part2():
 	n = np.array([n for n in range(0, 1000)])
 	c = [[0.7217, 1.0247], [0.5346, 0.9273], [0.5346, 1.0247], [0.5346, 1.1328], [0.5906, 0.9273], [0.5906, 1.0247], [0.5906, 1.1328], [0.6535, 0.9273], [0.6535, 1.0247], [0.6535, 1.1328]]
 	d = [[] for x in range(0,10)]
@@ -27,7 +27,7 @@ def p2():
 		L = len(d[x])
 		X = fft.fft(d[x], n=2048)
 		X_abs = 2* np.absolute(X) / L
-		half = int(2048/2)
+		half = 1024
 		freq = fft.fftfreq(2048, d=1/8192)
 		fig, ax = plt.subplots(1, 1)
 		ax.plot(freq[:half], X_abs[:half])
@@ -37,7 +37,7 @@ def p2():
 		ax.grid()
 		plt.show()
 
-def p3():
+def part3():
 	n = np.array([n for n in range(0, 1000)])
 	space = np.zeros(100)
 	c = [[0.7217, 1.0247], [0.5346, 0.9273], [0.5346, 1.0247], [0.5346, 1.1328], [0.5906, 0.9273], [0.5906, 1.0247], [0.5906, 1.1328], [0.6535, 0.9273], [0.6535, 1.0247], [0.6535, 1.1328]]
@@ -53,24 +53,19 @@ def p3():
 			phone.extend(d[x])
 	wavfile.write('sid.wav', 8192 , np.array(phone))
 
-def p4():
-	phoneReader = [[], []]
-	phoneReader[0] = list(csv.reader(open('phone1.csv', newline=''), delimiter=','))
-	phoneReader[1] = list(csv.reader(open('phone2.csv', newline=''), delimiter=','))
-	print(phoneReader[0][0])
-	print(phoneReader[1][0])
+def part4():
+	phoneData = [[], []]
+	phoneData[0] = list(csv.reader(open('phone1.csv', newline=''), delimiter=','))
+	phoneData[1] = list(csv.reader(open('phone2.csv', newline=''), delimiter=','))
 	for r in range(0,2):
 		dt = [[0 for k in range(0,1000)] for x in range(0,7)]
-		# print(dt)
 		base = 0
 		for x in range(0,7):
 			for i in range(0,1000):
-				dt[x][i] = phoneReader[r][0][base+i]
+				dt[x][i] = phoneData[r][0][base+i]
 			base += 1100
 		for x in range(0,7):
 			L = len(dt[x])
-			#print('L =', L, sep=' ')
-			#* nextpow2(L)
 			X = fft.fft(dt[x], n=2048)
 			X_abs = 2* np.absolute(X) / L
 			half = int(2048/2)
@@ -83,45 +78,33 @@ def p4():
 			ax.grid()
 			plt.show()
 
-def comp(l1, l2):
-	print(l1[1])
-	print(l2[1])
-	for x in range(0,1000):
-		if l1[x] != l2[x]:
-			return False
-	return True
-
-
 def ttdecode(inlist):
 	n = np.array([n for n in range(0, 1000)])
 	c = [[0.7217, 1.0247], [0.5346, 0.9273], [0.5346, 1.0247], [0.5346, 1.1328], [0.5906, 0.9273], [0.5906, 1.0247], [0.5906, 1.1328], [0.6535, 0.9273], [0.6535, 1.0247], [0.6535, 1.1328]]
 	d = [[] for x in range(0,10)]
 	for x in range(0,10):
 		d[x] = np.sin(c[x][0]*n) + np.sin(c[x][1]*n)
-	dt = [[0 for k in range(0,1000)] for x in range(0,7)]
-	# print(dt)
+	dt = np.zeros((7,1000))
 	base = 0
 	for x in range(0,7):
 		for i in range(0,1000):
 			dt[x][i] = inlist[base+i]
 		base += 1100
+	result=[]
 	for x in range(0,7):
 		for y in range(0,10):
-			# c = (np.array(dt[x]) == np.array(d[y]))
-			if comp(dt[x],d[y]):
-				if not x == 6:
-					print(y, end = " ")
-				else:
-					print(y)
+			if np.allclose(dt[x],d[y],atol=1):
+				result.append(y)
+				break
+	return result
 
 
-def p5():
+def part5():
 	phoneReader = [[], []]
-	phoneReader[0] = list(csv.reader(open('phone1.csv', newline=''), delimiter=','))
-	phoneReader[1] = list(csv.reader(open('phone2.csv', newline=''), delimiter=','))
-	# print(phoneReader[0][0])
-	# print(phoneReader[1][0])
+	phoneReader[0] = np.array(list(csv.reader(open('phone1.csv', newline=''), delimiter=',')))
+	phoneReader[1] = np.array(list(csv.reader(open('phone2.csv', newline=''), delimiter=',')))
 	for r in range(0,2):
-		ttdecode(phoneReader[r][0])
+		testout = ttdecode(phoneReader[r][0])
+		print(testout)
 
-p5()
+part5()
